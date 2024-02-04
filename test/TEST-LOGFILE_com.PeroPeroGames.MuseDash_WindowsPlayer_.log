@@ -1,0 +1,29 @@
+"Info","time":"2024/1/21 20:15:18.674","msg":"[GCManager]GC is Enable From IL2CPP: True","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.675","msg":"tag:Resource::[ResourcesManager]: Start Loading Asset:character_ChineseS Type:UnityEngine.TextAsset IsAsync:False","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.677","msg":"tag:Resource::[ResourcesManager]: Start Loading Asset:elfin_ChineseS Type:UnityEngine.TextAsset IsAsync:False","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.679","msg":"Controller Name KeyboardCustom0","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.679","msg":"[GameAccountSystem]: IsOversea : False","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/22 20:15:18.d80","msg":"============== Send to url: https://prpr-muse-dash.peropero.net/statistics/pc-play-statistics-feedback on method: POST ============== 
+with data: {"player":"<REDACTED>","player_level":82,"music_uid":"23-0","music_name":"雨后甜点","music_difficulty":2,"music_level":4,"character_uid":"25","character_name":"初音未来-虚拟歌手","elfin_uid":"10","elfin_name":"霓虹彩蛋","result_finished":true,"result_acc":92.02,"result_score":76335,"result_combo":92,"result_full_combo":false,"controller_name":"KeyboardCustom0"}
+with header: {"Authorization":"<REDACTED>","Version":"3.12.0","Platform":"pc"}","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.683","msg":"Realtek PCIe GbE Family Controller","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.683","msg":"--Phy:40B076A26A37","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.695","msg":"[GameAccountSystem]: IsOversea : False","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.695","msg":"[GameAccountSystem]: IsOversea : False","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.696","msg":"============== Send to url: https://prpr-muse-dash.peropero.net/musedash/v3/pcleaderboard/high-score on method: POST ============== 
+with data: {"payload":"<REDACTED>","platform":"pc","version":"3.12.0"}
+with header: {"Authorization":"<REDACTED>","Version":"3.12.0","Platform":"pc"}","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.700","msg":"tag:Resource::[ResourcesManager]: Start Loading Asset:miku_girl_victory_show Type:UnityEngine.GameObject IsAsync:False","stackTrace":null,"gameId":"com.PeroPeroGames.MuseDash","userId":null,"deviceId":"<REDACTED>","sessionId":"<REDACTED>","platform":"WindowsPlayer","version":"3.12.0"}
+
+{"level":"Info","time":"2024/1/21 20:15:18.740","msg":"tag:Resource::[ResourcesManager]: Start Loading Asset:Vo
