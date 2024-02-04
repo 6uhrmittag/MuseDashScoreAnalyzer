@@ -81,6 +81,9 @@ Get-ChildItem $logPath -Filter *.log | ForEach-Object {
             }
             $jsonData_DATA = $match_data | ConvertFrom-Json
 
+            # clean-up jsonData_DATA since some seem to have '<b>' and '</b>' in them
+            $jsonData_DATA.music_name = $jsonData_DATA.music_name -replace '<b>|</b>'
+
             # Add the relevant fields to an object and add it to the gameData array
             $gameData += [PSCustomObject]@{
                 time = $time
