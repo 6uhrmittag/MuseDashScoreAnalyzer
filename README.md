@@ -22,9 +22,9 @@ I want to have a view of my own Muse Dash scores over time to see how I improve.
 - [ ] maybe one chart with all scores to see all scores over time
 - [ ] exclude failed runs(`result_finished:false`) from the chart
 - [ ] add more charts for different statistics
-    - [ ] failed runs
-    - [ ] full combo
-    - [ ] total runs per song
+    - [x] failed runs
+    - [x] full combo
+    - [x] total runs per song
     - [ ] most used character
 
 # How to use

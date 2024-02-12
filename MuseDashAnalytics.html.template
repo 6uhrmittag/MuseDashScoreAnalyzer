@@ -50,6 +50,15 @@
             margin-bottom: 10px;
         }
 
+        .stats {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            max-width: 800px;
+        }
+
         canvas {
             margin-top: 10px;
         }
@@ -62,6 +71,10 @@
 </h1>
 <p>Your Score and Accuracy over Time. Hover over the dots to see details!</p>
 
+<div class="stats"><p id="overallStats">Overall Statistics</p></div>
+
+
+
 <div id="chartsArea"></div>
 
 <script>
@@ -73,6 +86,40 @@
             var data = <INSERT JSON HERE>;
 
             var includeUnfinished = false;
+
+
+            function displayOverallStatistics(data) {
+                var completedRunsOverall = data.filter(item => item.result_finished === true).length;
+                var failedRunsOverall = data.filter(item => item.result_finished === false).length;
+                var sumRunsOverall = data.length; // Total runs are simply the length of the entire dataset
+
+                var FullCombo = data.filter(item => item.result_full_combo === true).length;
+
+                // Find first and last run dates
+                var allDates = data.map(item => new Date(item.time.split(' ')[0]));
+                var minDate = new Date(Math.min.apply(null, allDates)).toISOString().split('T')[0];
+                var maxDate = new Date(Math.max.apply(null, allDates)).toISOString().split('T')[0];
+
+                // Main statistics text
+                var statsTextOverall = `Total Runs: ${sumRunsOverall}, Completed Runs: ${completedRunsOverall}, Failed Runs: ${failedRunsOverall}, Full Combo: ${FullCombo}`;
+                var statsElementOverall = document.createElement('p');
+                statsElementOverall.textContent = statsTextOverall;
+
+                // First and Last Run dates on a new line
+                var dateRangeText = `First Run: ${minDate}, Last Run: ${maxDate}`;
+                var dateRangeElement = document.createElement('p');
+                dateRangeElement.textContent = dateRangeText;
+
+                var overallStatsContainer = document.getElementById('overallStats');
+                if (overallStatsContainer) {
+                    overallStatsContainer.appendChild(statsElementOverall); // Append overall statistics
+                    overallStatsContainer.appendChild(dateRangeElement); // Append date range info on a new line
+                }
+            }
+
+           // Call this function after data is loaded or at the end of the processData function
+            displayOverallStatistics(data);
+
 
             // Calculate earliest and latest date
             let allDates = data.map(item => new Date(item.time.split(' ')[0]));
@@ -89,14 +136,23 @@
                     return acc;
                 }, {});
 
-                // Sort songs by the number of data points they have, in descending order
-                var sortedSongs = Object.keys(groupedBySong).sort((a, b) => {
-                    return groupedBySong[b].length - groupedBySong[a].length;
-                });
-
-                sortedSongs.forEach(songName => {
+                Object.keys(groupedBySong).forEach(songName => {
                     var songData = groupedBySong[songName];
                     var songContainer = createSongContainer(songName);
+
+                    // Calculate song-specific statistics
+                    var completedRuns = songData.filter(item => item.result_finished === true).length;
+                    var failedRuns = songData.filter(item => item.result_finished === false).length;
+                    var sumRuns = songData.length; // Total runs are simply the length of songData for this song
+
+                    var FullCombo = songData.filter(item => item.result_full_combo === true).length;
+
+                    // Create and append statistics text
+                    var statsText = ` Total Runs: ${sumRuns}, Completed Runs: ${completedRuns}, Failed Runs: ${failedRuns}, Full Combo: ${FullCombo}`;
+                    var statsElement = document.createElement('p');
+                    statsElement.textContent = statsText;
+                    songContainer.appendChild(statsElement); // Append statistics below the song title
+
                     document.getElementById('chartsArea').appendChild(songContainer);
 
                     var songChartsData = prepareChartData(songData);
