@@ -135,7 +135,13 @@
                     return acc;
                 }, {});
 
-                Object.keys(groupedBySong).forEach(songName => {
+
+                // Sort songs by the total number of data points, in descending order
+                var sortedSongs = Object.keys(groupedBySong).sort((a, b) => {
+                    return groupedBySong[b].length - groupedBySong[a].length;
+                });
+
+                sortedSongs.forEach(songName => {
                     var songData = groupedBySong[songName];
                     var songContainer = createSongContainer(songName);
 
