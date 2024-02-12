@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Muse Dash Score Analyzer</title>
+
+    <meta charset="UTF-8">
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+
+    <style>
+        body {
+            font-family: source-han-sans-simplified-c, sans-serif;
+            font-style: normal;
+            font-weight: 700;
+            background-color: #f4f4f8;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: rgba(254, 48, 183, 0.8);
+            color: #fff;
+            padding: 20px 0;
+            margin: 0;
+            font-size: 28px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .chart-container {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            max-width: 800px;
+        }
+
+        .song-title {
+            font-size: 20px;
+            color: #fa92fc;
+            margin-bottom: 10px;
+        }
+
+        canvas {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎵
+    <span style="color: #f9d71f;">MUSE</span><span style="color: #ff1a89;">DASH</span> Score Analyzer 🎵
+</h1>
+<p>Your Score and Accuracy over Time. Hover over the dots to see details!</p>
+
+<div id="chartsArea"></div>
+
+<script>
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+
+            var data = <INSERT JSON HERE>;
+
+            var includeUnfinished = false;
+
+            // Calculate earliest and latest date
+            let allDates = data.map(item => new Date(item.time.split(' ')[0]));
+            let minDate = new Date(Math.min(...allDates));
+            let maxDate = new Date(Math.max(...allDates));
+            console.log("Min date:", minDate);
+            console.log("Max date:", maxDate);
+
+
+            function processData(data) {
+                var groupedBySong = data.reduce((acc, item) => {
+                    if (!acc[item.music_name]) acc[item.music_name] = [];
+                    acc[item.music_name].push(item);
+                    return acc;
+                }, {});
+
+                // Sort songs by the number of data points they have, in descending order
+                var sortedSongs = Object.keys(groupedBySong).sort((a, b) => {
+                    return groupedBySong[b].length - groupedBySong[a].length;
+                });
+
+                sortedSongs.forEach(songName => {
+                    var songData = groupedBySong[songName];
+                    var songContainer = createSongContainer(songName);
+                    document.getElementById('chartsArea').appendChild(songContainer);
+
+                    var songChartsData = prepareChartData(songData);
+                    generateChartsForSong(songChartsData, songName);
+                });
+            }
+
+
+            function createSongContainer(songName) {
+                var container = document.createElement('div');
+                container.className = 'chart-container';
+                container.id = `container-${songName.replace(/\s+/g, '-')}`;
+
+                var title = document.createElement('h2');
+                title.className = 'song-title';
+                title.textContent = songName;
+                container.appendChild(title);
+
+                var scoreCanvas = document.createElement('canvas');
+                scoreCanvas.id = `scoreChart-${songName.replace(/\s+/g, '-')}`;
+                container.appendChild(scoreCanvas);
+
+                var accuracyCanvas = document.createElement('canvas');
+                accuracyCanvas.id = `accuracyChart-${songName.replace(/\s+/g, '-')}`;
+                container.appendChild(accuracyCanvas);
+
+                return container;
+            }
+
+            function prepareChartData(songData) {
+                var getRandomColor = createColorGenerator(); // Create a new shuffled color generator for this chart
+
+                var labels = songData.map(item => item.time.split(' ')[0]);
+
+                // Calculate the count of data points for each level
+                var levelCounts = songData.reduce((acc, item) => {
+                    acc[item.music_level] = (acc[item.music_level] || 0) + 1;
+                    return acc;
+                }, {});
+
+                // Sort levels based on the count of data points, descending
+                var levels = [...new Set(songData.map(item => item.music_level))]
+                    .sort((a, b) => levelCounts[b] - levelCounts[a]);
+
+                // Create datasets
+                var datasetsScore = levels.map(level => ({
+                    label: `Level ${level}`,
+                    data: songData.filter(item => item.music_level === level).map(item => parseInt(item.result_score)),
+                    borderColor: getRandomColor(),
+                    fill: false,
+                }));
+
+                var datasetsAccuracy = levels.map(level => ({
+                    label: `Level ${level}`,
+                    data: songData.filter(item => item.music_level === level).map(item => parseFloat(String(item.result_acc).replace(',', '.'))),
+                    borderColor: getRandomColor(),
+                    fill: false,
+                }));
+
+                return {labels, datasetsScore, datasetsAccuracy};
+            }
+
+
+            function generateChartsForSong(chartData, songName) {
+                var scoreCtx = document.getElementById(`scoreChart-${songName.replace(/\s+/g, '-')}`).getContext('2d');
+                var accuracyCtx = document.getElementById(`accuracyChart-${songName.replace(/\s+/g, '-')}`).getContext('2d');
+
+                new Chart(scoreCtx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: chartData.datasetsScore
+                    },
+                    options: {
+                        maintainAspectRatio: true,
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Score over Time'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    afterBody: function (context) {
+                                        var dataPoint = data[context[0].dataIndex];
+                                        return [
+                                            `Time: ${dataPoint.time.split('.')[0]}`,
+                                            `Character: ${dataPoint.character_name}`,
+                                            `Elfin: ${dataPoint.elfin_name || 'None'}`,
+                                            `Combo: ${dataPoint.result_combo}`,
+                                            `Full Combo: ${dataPoint.result_full_combo ? 'Yes' : 'No'}`
+                                        ];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                //    type: 'time',
+                                time: {
+                                    //   unit: 'day',
+                                    //tooltipFormat: 'YYYY-MM-DD HH:mm:ss',
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Score'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                new Chart(accuracyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: chartData.datasetsAccuracy
+                    },
+                    options: {
+                        maintainAspectRatio: true,
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Accuracy over Time'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    afterBody: function (context) {
+                                        var dataPoint = data[context[0].dataIndex];
+                                        return [
+                                            `Time: ${dataPoint.time.split('.')[0]}`,
+                                            `Character: ${dataPoint.character_name}`,
+                                            `Elfin: ${dataPoint.elfin_name || 'None'}`,
+                                            `Combo: ${dataPoint.result_combo}`,
+                                            `Full Combo: ${dataPoint.result_full_combo ? 'Yes' : 'No'}`
+                                        ];
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                //       type: 'time',
+
+                                time: {
+                                    //         unit: 'day',
+                                    // tooltipFormat: 'YYYY-MM-DD',
+
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Accuracy in %'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Create a uniq colour palette per chart to prevent duplicate colours per chart
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+                }
+                return array;
+            }
+
+            function createColorGenerator() {
+                // Muse Dash-inspired colors: bright pinks, purples, blues, etc.
+                var colors = [
+                    '#FA92FC', // Bright Pink
+                    '#92CAFB', // Sky Blue
+                    '#FDCB6E', // Bright Yellow
+                    '#A29BFE', // Light Purple
+                    '#74B9FF', // Soft Blue
+                    '#FD79A8', // Pinkish
+                    '#55EFC4', // Aqua
+                    '#FAB1A0', // Soft Orange
+                    '#FFEAA7', // Pale Yellow
+                    '#FD7272'  // Soft Red
+                ];
+
+                // Shuffle the colors for this instance
+                var shuffledColors = shuffleArray(colors.slice()); // Use slice to clone the array
+                var index = 0;
+
+                // Generator function to cycle through colors
+                return function () {
+                    const color = shuffledColors[index % shuffledColors.length];
+                    index++;
+                    return color;
+                };
+            }
+
+
+            // Initial call
+            processData(data, includeUnfinished);
+        }
+    )
+    ;
+</script>
+
+</body>
+</html>
+

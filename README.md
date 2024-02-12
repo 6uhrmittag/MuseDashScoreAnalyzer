@@ -2,29 +2,40 @@
 
 Helper to view and analyze personal statistic of your Muse Dash scores.
 
-**Status:** This currently only exports the scores to a csv and json file for further analysis in Excel/Google Calc etc.
+**Status:** This script exports the scores as CSV and JSON and creates a HTML site with charts using [charts.js](https://www.chartjs.org/)
 
 **Disclaimer:** This works only for windows and only for game runs on that specific computer, since it extracts the scores from local log-files. I don't know far back th log-files go, so it might not be able to extract all scores.
 
-## Goal
+## Overall Motivation
 
 I want to have a view of my own Muse Dash scores over time to see how I improve.
 
 - Ideally as an easy-to-use application that anyone can use
 - Maybe integrated as a mod for https://mdmc.moe
 
-## Status
+## Status and Todos
 
-Currently, the powershell script Export-MuseDashScores.ps1 analyzes all local log-files and exports the scores to a csv file and a json file for further analysis in Excel/Google Calc etc.
+- [x] Export scores as CSV and JSON
+- [x] Visualize scores and accuracy per song in a chart
+- [ ] translate/map the character and elfin names to english (right now it only shows the chinese names because that's what the log-files contain and I have not found a map from ID to name yet)
+    - [ ] create a mapping chart from ID to chinese and english name
+- [ ] maybe one chart with all scores to see all scores over time
+- [ ] exclude failed runs(`result_finished:false`) from the chart
+- [ ] add more charts for different statistics
+    - [ ] failed runs
+    - [ ] full combo
+    - [ ] total runs per song
+    - [ ] most used character
 
 # How to use
 
 ## Export-MuseDashScores.ps1
 
-1. Download `Export-MuseDashScores.ps1`
+1. Download `Export-MuseDashScores.ps1` and `MuseDashAnalytics.html.template`
 2. Open powershell
 3. Navigate to the directory where the script is located
 4. Run the script with `.\Export-MuseDashScores.ps1`
+5. The script creates `MuseDashAnalytics.html` and opens it in your default browser
 
 The script will export the scores to a csv file and a json file(with the same content):
 
@@ -32,6 +43,8 @@ The script will export the scores to a csv file and a json file(with the same co
 - `MuseDashScores.json`
 
 ![MuseDashExport.gif](_static/Export-MuseDashScores.ps1.gif)
+
+![Sceenshot_charts.png](_static/Sceenshot_charts.png)
 
 # Technical details
 
@@ -102,3 +115,4 @@ See `.\test` for demo files of the export.
 
 - Please open an issue if you have any questions or suggestions, as long as I somewhat understand the code I'm happy for any help
 - I heavily use ChatGPT-4 and GitHub Copilot to code. I'm not a professional developer, so please don't judge me for the code quality :D
+- Charting is done with [charts.js](https://www.chartjs.org/)

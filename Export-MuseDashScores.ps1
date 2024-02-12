@@ -118,3 +118,27 @@ $gameData | Export-Csv $csvFilePath -NoTypeInformation
 Write-Host "Scores have been successfully exported to CSV file: $csvFilePath"
 
 Write-Host "Muse Dash scores extraction process completed." -ForegroundColor Green
+
+
+
+# New code to insert JSON into HTML template
+
+# Step 1: Read the JSON data
+$jsonData = Get-Content $jsonFilePath -Raw
+
+# Step 2: Read the template HTML content
+$templateHtmlPath = "MuseDashAnalytics.html.template"
+$templateContent = Get-Content $templateHtmlPath -Raw
+
+# Step 3: Replace the placeholder with the JSON data
+# Make sure your template has a line with: var data = <INSERT JSON HERE>;
+$modifiedContent = $templateContent -replace "<INSERT JSON HERE>", $jsonData
+
+# Step 4: Save the modified content as a new HTML file
+$newHtmlFilePath = "MuseDashAnalytics.html"
+$modifiedContent | Set-Content $newHtmlFilePath
+
+Write-Host "Muse Dash analytics HTML file has been successfully created: $newHtmlFilePath" -ForegroundColor Green
+
+# Open the newly created HTML file in the default web browser
+Invoke-Item $newHtmlFilePath
