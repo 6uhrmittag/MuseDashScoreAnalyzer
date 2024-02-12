@@ -17,6 +17,7 @@ I want to have a view of my own Muse Dash scores over time to see how I improve.
 
 - [x] Export scores as CSV and JSON
 - [x] Visualize scores and accuracy per song in a chart
+- [ ] Show details when hovering over a data point (e.g. character, elfin... )
 - [ ] translate/map the character and elfin names to english (right now it only shows the chinese names because that's what the log-files contain and I have not found a map from ID to name yet)
     - [ ] create a mapping chart from ID to chinese and english name
 - [ ] maybe one chart with all scores to see all scores over time

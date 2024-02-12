@@ -69,7 +69,6 @@
 <h1>🎵
     <span style="color: #f9d71f;">MUSE</span><span style="color: #ff1a89;">DASH</span> Score Analyzer 🎵
 </h1>
-<p>Your Score and Accuracy over Time. Hover over the dots to see details!</p>
 
 <div class="stats"><p id="overallStats">Overall Statistics</p></div>
 
@@ -234,20 +233,20 @@
                                 display: true,
                                 text: 'Score over Time'
                             },
-                            tooltip: {
-                                callbacks: {
-                                    afterBody: function (context) {
-                                        var dataPoint = data[context[0].dataIndex];
-                                        return [
-                                            `Time: ${dataPoint.time.split('.')[0]}`,
-                                            `Character: ${dataPoint.character_name}`,
-                                            `Elfin: ${dataPoint.elfin_name || 'None'}`,
-                                            `Combo: ${dataPoint.result_combo}`,
-                                            `Full Combo: ${dataPoint.result_full_combo ? 'Yes' : 'No'}`
-                                        ];
-                                    }
-                                }
-                            }
+                            //tooltip: {
+                            //    callbacks: {
+                            //        afterBody: function (context) {
+                            //            var dataPoint = data[context[0].dataIndex];
+                            //            return [
+                            //                `Time: ${dataPoint.time.split('.')[0]}`,
+                            //                `Character: ${dataPoint.character_name}`,
+                            //                `Elfin: ${dataPoint.elfin_name || 'None'}`,
+                            //                `Combo: ${dataPoint.result_combo}`,
+                            //                `Full Combo: ${dataPoint.result_full_combo ? 'Yes' : 'No'}`
+                            //            ];
+                            //        }
+                            //    }
+                            //}
                         },
                         scales: {
                             x: {
@@ -285,20 +284,20 @@
                                 display: true,
                                 text: 'Accuracy over Time'
                             },
-                            tooltip: {
-                                callbacks: {
-                                    afterBody: function (context) {
-                                        var dataPoint = data[context[0].dataIndex];
-                                        return [
-                                            `Time: ${dataPoint.time.split('.')[0]}`,
-                                            `Character: ${dataPoint.character_name}`,
-                                            `Elfin: ${dataPoint.elfin_name || 'None'}`,
-                                            `Combo: ${dataPoint.result_combo}`,
-                                            `Full Combo: ${dataPoint.result_full_combo ? 'Yes' : 'No'}`
-                                        ];
-                                    }
-                                }
-                            }
+                            //tooltip: {
+                            //    callbacks: {
+                            //        afterBody: function (context) {
+                            //            var dataPoint = data[context[0].dataIndex];
+                            //            return [
+                            //                `Time: ${dataPoint.time.split('.')[0]}`,
+                            //                `Character: ${dataPoint.character_name}`,
+                            //                `Elfin: ${dataPoint.elfin_name || 'None'}`,
+                            //                `Combo: ${dataPoint.result_combo}`,
+                            //                `Full Combo: ${dataPoint.result_full_combo ? 'Yes' : 'No'}`
+                            //            ];
+                            //        }
+                            //    }
+                            //}
                         },
                         scales: {
                             x: {
