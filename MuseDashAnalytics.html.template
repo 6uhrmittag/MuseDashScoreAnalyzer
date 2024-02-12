@@ -116,7 +116,7 @@
                 }
             }
 
-           // Call this function after data is loaded or at the end of the processData function
+            // Call this function after data is loaded or at the end of the processData function
             displayOverallStatistics(data);
 
 
@@ -188,36 +188,36 @@
             }
 
             function prepareChartData(songData) {
-                var getRandomColor = createColorGenerator(); // Create a new shuffled color generator for this chart
+                // Ensure songData is sorted by time
+                songData.sort((a, b) => new Date(a.time) - new Date(b.time));
 
-                var labels = songData.map(item => item.time.split(' ')[0]);
+                var getRandomColor = createColorGenerator(); // For unique colors in the chart
 
-                // Calculate the count of data points for each level
-                var levelCounts = songData.reduce((acc, item) => {
-                    acc[item.music_level] = (acc[item.music_level] || 0) + 1;
-                    return acc;
-                }, {});
+                // Assuming levelCounts and sorting logic is to organize or filter data as needed
+                var levels = [...new Set(songData.map(item => item.music_level))].sort();
 
-                // Sort levels based on the count of data points, descending
-                var levels = [...new Set(songData.map(item => item.music_level))]
-                    .sort((a, b) => levelCounts[b] - levelCounts[a]);
-
-                // Create datasets
                 var datasetsScore = levels.map(level => ({
                     label: `Level ${level}`,
-                    data: songData.filter(item => item.music_level === level).map(item => parseInt(item.result_score)),
+                    data: songData.filter(item => item.music_level === level).map(item => ({
+                        x: new Date(item.time.split('.')[0]), // Using 'x' for time
+                        y: parseInt(item.result_score), // 'y' for score
+                    })),
                     borderColor: getRandomColor(),
                     fill: false,
                 }));
 
                 var datasetsAccuracy = levels.map(level => ({
                     label: `Level ${level}`,
-                    data: songData.filter(item => item.music_level === level).map(item => parseFloat(String(item.result_acc).replace(',', '.'))),
+                    data: songData.filter(item => item.music_level === level).map(item => ({
+                        x: new Date(item.time.split('.')[0]), // Using 'x' for time
+                        y: parseFloat(String(item.result_acc).replace(',', '.')), // 'y' for accuracy
+                    })),
                     borderColor: getRandomColor(),
                     fill: false,
                 }));
 
-                return {labels, datasetsScore, datasetsAccuracy};
+                // No need to return 'labels' as it's not used for time series charts
+                return {datasetsScore, datasetsAccuracy};
             }
 
 
@@ -256,10 +256,15 @@
                         },
                         scales: {
                             x: {
-                                //    type: 'time',
+                                type: 'time',
+                                // suggestedMin: minDate,
+                                // suggestedMax: maxDate,
                                 time: {
-                                    //   unit: 'day',
-                                    //tooltipFormat: 'YYYY-MM-DD HH:mm:ss',
+                                    tooltipFormat: 'yyyy-MM-dd hh:mm:ss',
+                                    unit: "day",
+                                    displayFormats: {
+                                        day: 'yyyy-MM-dd'
+                                    }
                                 },
                                 title: {
                                     display: true,
@@ -307,12 +312,15 @@
                         },
                         scales: {
                             x: {
-                                //       type: 'time',
-
+                                type: 'time',
+                                // suggestedMin: minDate,
+                                // suggestedMax: maxDate,
                                 time: {
-                                    //         unit: 'day',
-                                    // tooltipFormat: 'YYYY-MM-DD',
-
+                                    tooltipFormat: 'yyyy-MM-dd hh:mm:ss',
+                                    unit: "day",
+                                    displayFormats: {
+                                        day: 'yyyy-MM-dd'
+                                    }
                                 },
                                 title: {
                                     display: true,
