@@ -18,8 +18,8 @@ I want to have a view of my own Muse Dash scores over time to see how I improve.
 - [x] Export scores as CSV and JSON
 - [x] Visualize scores and accuracy per song in a chart
 - [ ] Show details when hovering over a data point (e.g. character, elfin... )
-- [ ] translate/map the character and elfin names to english (right now it only shows the chinese names because that's what the log-files contain and I have not found a map from ID to name yet)
-    - [ ] create a mapping chart from ID to chinese and english name
+- [x] translate/map the character and elfin names to english (right now it only shows the chinese names because that's what the log-files contain and I have not found a map from ID to name yet)
+    - [x] create a mapping chart from ID to chinese and english name
 - [ ] maybe one chart with all scores to see all scores over time
 - [ ] exclude failed runs(`result_finished:false`) from the chart
 - [ ] add more charts for different statistics
@@ -50,6 +50,10 @@ The script will export the scores to a csv file and a json file(with the same co
 ![MuseDashExport.gif](_static/Export-MuseDashScores.ps1.gif)
 
 ![Sceenshot_charts.png](_static/Sceenshot_charts.png)
+
+### Disable Translation of Characters and Elfins to English
+
+Run the script with `.\Export-MuseDashScores.ps1 -KeepOriginalNames`
 
 # Technical details
 

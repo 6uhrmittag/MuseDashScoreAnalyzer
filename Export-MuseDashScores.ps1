@@ -10,6 +10,9 @@
 .PARAMETER test
     Indicates whether the script should run in test mode. When specified, the script uses an alternative log path for testing purposes.
 
+.PARAMETER KeepOriginalNames
+    Do not translate character and elfin names to English.
+
 .EXAMPLE
     .\ExtractGameData.ps1
     Runs the script with the default log path. It will automatically locate the Muse Dash log files, extract the scores, and export them to MuseDashScores.csv and MuseDashScores.json in the current directory.
@@ -21,7 +24,8 @@
 #>
 
 param (
-    [switch]$test
+    [switch]$test,
+    [switch]$KeepOriginalNames
 )
 
 # Configuration variables
@@ -61,6 +65,50 @@ $gameData = @()
 # Define a regex pattern to filter lines related to statistics feedback
 $pattern = '({"level":"Info".*pc-play-statistics-feedback.*[\s\S].*with data:(.*)[\s\S])(with header.*})'
 
+$characterMap = @{
+    "26" = "Virtual Singers Kagamine Rin & Len"
+    "25" = "Virtual Singer Hatsune Miku"
+    "24" = "Exorcist Master Buro"
+    "23" = "Boxer Ola"
+    "22" = "Leader of Rhodes Island Amiya"
+    "21" = "Black-white Magician Kirisame Marisa"
+    "20" = "Sister Marija"
+    "19" = "Rebirth Girl El_Clear"
+    "18" = "Red-white Miko Hakurei Reimu"
+    "17" = "Part-Time Warrior Rin"
+    "16" = "Game streamer NEKO#ΦωΦ"
+    "15" = "Navigator Yume"
+    "14" = "Sailor Suit Buro"
+    "13" = "Christmas Gift Rin"
+    "12" = "The Girl In Black Marija"
+    "11" = "Little Devil Marija"
+    "10" = "Magical Girl Marija"
+    "9" = "Maid Marija"
+    "8" = "Violinist Marija"
+    "7" = "Joker Buro"
+    "6" = "Zombie Girl Buro"
+    "5" = "Idol Buro"
+    "4" = "Pilot Buro"
+    "3" = "Bunny Girl Rin"
+    "2" = "Sleepwalker Girl Rin"
+    "1" = "Bad Girl Rin"
+    "0" = "Bassist Rin"
+}
+
+$elfinMap = @{
+    "10" = "Neon Egg"
+    "9" = "Silencer"
+    "8" = "Dr. Paige"
+    "7" = "Lilith"
+    "6" = "Dragon Girl"
+    "5" = "Little Witch"
+    "4" = "Little Nurse"
+    "3" = "Rabot-233"
+    "2" = "Thanatos"
+    "1" = "Angela"
+    "0" = "Mio Sir"
+}
+
 # Process each log file
 Get-ChildItem $logPath -Filter *.log | ForEach-Object {
     $filePath = $_.FullName
@@ -84,6 +132,28 @@ Get-ChildItem $logPath -Filter *.log | ForEach-Object {
             # clean-up jsonData_DATA since some seem to have '<b>' and '</b>' in them
             $jsonData_DATA.music_name = $jsonData_DATA.music_name -replace '<b>|</b>'
 
+            # Translate Character and Elfin names to English if required
+            $character_name = if (-not$KeepOriginalNames -and $characterMap.ContainsKey($jsonData_DATA.character_uid))
+            {
+                $characterMap[$jsonData_DATA.character_uid]
+            }
+            else
+            {
+                $jsonData_DATA.character_name
+            }
+            $elfin_name = if ($null -ne $jsonData_DATA.elfin_uid -and -not$KeepOriginalNames -and $elfinMap.ContainsKey($jsonData_DATA.elfin_uid))
+            {
+                $elfinMap[$jsonData_DATA.elfin_uid]
+            }
+            elseif ($null -eq $jsonData_DATA.elfin_uid)
+            {
+                "No Elfin"
+            }
+            else
+            {
+                $jsonData_DATA.elfin_name
+            }
+
             # Add the relevant fields to an object and add it to the gameData array
             $gameData += [PSCustomObject]@{
                 time = $time
@@ -92,9 +162,9 @@ Get-ChildItem $logPath -Filter *.log | ForEach-Object {
                 music_difficulty = $jsonData_DATA.music_difficulty
                 music_level = $jsonData_DATA.music_level
                 character_uid = $jsonData_DATA.character_uid
-                character_name = $jsonData_DATA.character_name
+                character_name = $character_name # Use the pre-determined value
                 elfin_uid = $jsonData_DATA.elfin_uid
-                elfin_name = $jsonData_DATA.elfin_name
+                elfin_name = $elfin_name # Use the pre-determined value
                 result_acc = $jsonData_DATA.result_acc
                 result_score = $jsonData_DATA.result_score
                 result_finished = $jsonData_DATA.result_finished
