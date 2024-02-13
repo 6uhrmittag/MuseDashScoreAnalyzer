@@ -15,9 +15,6 @@ This Repo currently contains two versions:
 
 I want to have a view of my own Muse Dash scores over time to see how I improve.
 
-- Ideally as an easy-to-use application that anyone can use
-- Maybe integrated as a mod for https://mdmc.moe
-
 ## Status and Todos
 
 - [x] Export scores as CSV and JSON
@@ -25,6 +22,7 @@ I want to have a view of my own Muse Dash scores over time to see how I improve.
 - [ ] Show details when hovering over a data point (e.g. character, elfin... )
 - [x] translate/map the character and elfin names to english (right now it only shows the chinese names because that's what the log-files contain and I have not found a map from ID to name yet)
     - [x] create a mapping chart from ID to chinese and english name
+    - [ ] add a switch to turn off the translation for the online version
 - [ ] maybe one chart with all scores to see all scores over time
 - [ ] exclude failed runs(`result_finished:false`) from the chart
 - [ ] add more charts for different statistics
