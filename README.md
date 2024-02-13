@@ -26,7 +26,11 @@ I want to have a view of my own Muse Dash scores over time to see how I improve.
     - [x] failed runs
     - [x] full combo
     - [x] total runs per song
-    - [ ] most used character
+    - [x] most used character
+    - [x] most used elfin
+    - [x] most played song
+    - [x] finished vs. failed runs
+    - [x] full combo vs. no full combo runs
 
 # How to use
 
@@ -103,6 +107,27 @@ The info we are interested in is:
 - the `character_name` would need to be mapped to the english character name in the game (or the script needs multiple language support)
 - the `elfin_name` would need to be mapped to the english elfin name in the game (or the script needs multiple language support)
 - the log-files also contain failed runs by setting `result_finished: false`. In this case the values for `result_score` etc. are empty
+
+### notes on the exported data
+
+````json
+{
+  "time": "Date and time of the finished run",
+  "music_uid": "ID of the song",
+  "music_name": "Name of the song(same as in the game)",
+  "music_difficulty": "Song difficulty (1-4; easy, hard, master, hidden)",
+  "music_level": "Song level (1-11)",
+  "character_uid": "ID of the character",
+  "character_name": "Name of the character in chinese",
+  "elfin_uid": "ID of the elfin",
+  "elfin_name": "Name of the elfin in chinese",
+  "result_acc": "Accuracy in percent",
+  "result_score": "Score of the run",
+  "result_finished": "Run finished(true) or not(false)",
+  "result_combo": "Highest combo in the run",
+  "result_full_combo": "Full Combo reached(true) or not(false)"
+}
+````
 
 ### testing
 

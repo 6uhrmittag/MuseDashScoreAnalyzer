@@ -41,7 +41,26 @@
             padding: 20px;
             background: #fff;
             border-radius: 10px;
-            max-width: 800px;
+            max-width: 900px;
+        }
+
+        .doughnut-container {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            /* max-width: 600 px; */
+            min-height: 350px;
+            flex-basis: calc(50% - 40px); /* Adjust width to allow 2 charts per row, accounting for margin/padding */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+
+        #doughnutChartsContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around; /* Adjust alignment as needed */
+            align-items: center;
         }
 
         .song-title {
@@ -73,6 +92,9 @@
 <div class="stats"><p id="overallStats">Overall Statistics</p></div>
 
 
+<div id="doughnutChartsContainer">
+
+</div>
 
 <div id="chartsArea"></div>
 
@@ -85,6 +107,125 @@
             var data = <INSERT JSON HERE>;
 
             var includeUnfinished = false;
+
+            <!-- Doughnut Charts on top -->
+            // Process data for "Used Characters"
+            let characterCounts = data.reduce((acc, item) => {
+                acc[item.character_name] = (acc[item.character_name] || 0) + 1;
+                return acc;
+            }, {});
+
+            // Process data for "Used Elfin"
+            let elfinCounts = data.reduce((acc, item) => {
+                acc[item.elfin_name] = (acc[item.elfin_name] || 0) + 1;
+                return acc;
+            }, {});
+
+            // Process data for "Runs per Song"
+            let songCounts = data.reduce((acc, item) => {
+                acc[item.music_name] = (acc[item.music_name] || 0) + 1;
+                return acc;
+            }, {});
+
+            // Function to create a doughnut chart
+            function createDoughnutChart(canvasId, title, data) {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(data),
+                        datasets: [{
+                            label: title,
+                            data: Object.values(data),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(255, 159, 64, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: true,
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: false,
+                                text: title
+                            }
+                        }
+                    }
+                });
+            }
+
+
+            //
+
+            // Add container elements for the charts in the HTML
+            const chartsArea = document.getElementById('doughnutChartsContainer');
+            chartsArea.innerHTML += '<div id="usedCharactersContainer" class="chart-container doughnut-container"></div>';
+            chartsArea.innerHTML += '<div id="usedElfinContainer" class="chart-container doughnut-container"></div>';
+            chartsArea.innerHTML += '<div id="playedSongsContainer" class="chart-container doughnut-container"></div>';
+
+            // Function to create a title and append it to the chart container
+            function addChartTitle(containerId, titleText) {
+                const container = document.getElementById(containerId);
+                const title = document.createElement('h2');
+                title.className = 'song-title'; // Ensure this matches your CSS class for titles
+                title.textContent = titleText;
+                container.appendChild(title);
+            }
+
+            // Now add the canvas to each container dynamically and set titles
+            addChartTitle('usedCharactersContainer', 'Runs by Character');
+            document.getElementById('usedCharactersContainer').innerHTML += '<canvas id="usedCharactersChart" class="doughnut-container"></canvas>';
+
+            addChartTitle('usedElfinContainer', 'Runs by Elfin');
+            document.getElementById('usedElfinContainer').innerHTML += '<canvas id="usedElfinChart" class="doughnut-container"></canvas>';
+
+            addChartTitle('playedSongsContainer', 'Runs per Song');
+            document.getElementById('playedSongsContainer').innerHTML += '<canvas id="playedSongsChart" class="doughnut-container"></canvas>';
+
+
+            // Sort slices of the doughnut chart by value to visually group them
+            function sortChartData(data) {
+                // Convert the object to an array of [key, value] pairs
+                let items = Object.entries(data);
+
+                // Sort items by value
+                items.sort((a, b) => b[1] - a[1]);
+
+                // Convert back to object with sorted order
+                let sortedData = {};
+                items.forEach(([key, value]) => {
+                    sortedData[key] = value;
+                });
+
+                return sortedData;
+            }
+
+            // Apply sorting to both characterCounts and songCounts
+            let sortedCharacterCounts = sortChartData(characterCounts);
+            let sortedElfinCounts = sortChartData(elfinCounts);
+            let sortedSongCounts = sortChartData(songCounts);
+
+            // Create the charts
+            createDoughnutChart('usedCharactersChart', 'Runs by Character', sortedCharacterCounts);
+            createDoughnutChart('usedElfinChart', 'Runs by Elfin', sortedElfinCounts);
+            createDoughnutChart('playedSongsChart', 'Played Songs', sortedSongCounts);
+
+            <!-- END of Doughnut Charts on top -->
 
 
             function displayOverallStatistics(data) {
@@ -373,6 +514,131 @@
                     return color;
                 };
             }
+
+            // Function to preprocess data for the new charts
+            function aggregateDataForCharts(data) {
+                // Helper function to format date to YYYY-MM-DD
+                function formatDate(date) {
+                    return date.toISOString().split('T')[0];
+                }
+
+                // Aggregate data
+                let dailyResults = data.reduce((acc, item) => {
+                    const date = formatDate(new Date(item.time));
+                    if (!acc[date]) {
+                        acc[date] = {finished: 0, failed: 0, fullCombo: 0, noFullCombo: 0};
+                    }
+                    if (item.result_finished) {
+                        acc[date].finished += 1;
+                        if (item.result_full_combo) {
+                            acc[date].fullCombo += 1;
+                        } else {
+                            acc[date].noFullCombo += 1;
+                        }
+                    } else {
+                        acc[date].failed += 1;
+                    }
+                    return acc;
+                }, {});
+
+                // Convert aggregated data into arrays for charting
+                const labels = Object.keys(dailyResults).sort();
+                const finishedData = labels.map(label => dailyResults[label].finished);
+                const failedData = labels.map(label => dailyResults[label].failed);
+                const fullComboData = labels.map(label => dailyResults[label].fullCombo);
+                const noFullComboData = labels.map(label => dailyResults[label].noFullCombo);
+
+                return {labels, finishedData, failedData, fullComboData, noFullComboData};
+            }
+
+            // Function to generate the stacked bar charts
+            function generateStackedBarCharts(data) {
+                const {
+                    labels,
+                    finishedData,
+                    failedData,
+                    fullComboData,
+                    noFullComboData
+                } = aggregateDataForCharts(data);
+
+                // Container for the first chart (Finished vs. Failed)
+                var containerHTML = '<div class="chart-container"><h2 class="song-title">Finished vs Failed Runs Over Time</h2><canvas id="finishedFailedChart"></canvas></div>';
+                document.getElementById('chartsArea').insertAdjacentHTML('beforeend', containerHTML);
+
+                // Container for the second chart (Full Combo vs. No Full Combo)
+                containerHTML = '<div class="chart-container"><h2 class="song-title">Full Combo Achievement Over Time</h2><canvas id="fullComboChart"></canvas></div>';
+                document.getElementById('chartsArea').insertAdjacentHTML('beforeend', containerHTML);
+
+                // Chart for Finished vs. Failed
+                var ctx = document.getElementById('finishedFailedChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Finished',
+                            data: finishedData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)'
+                        }, {
+                            label: 'Failed',
+                            data: failedData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.5)'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                stacked: true,
+                            },
+                            y: {
+                                stacked: true
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: false,
+                                text: 'Finished vs Failed Runs Over Time'
+                            }
+                        }
+                    }
+                });
+
+                // Chart for Full Combo vs. No Full Combo
+                ctx = document.getElementById('fullComboChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Full Combo',
+                            data: fullComboData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)'
+                        }, {
+                            label: 'No Full Combo',
+                            data: noFullComboData,
+                            backgroundColor: 'rgba(255, 159, 64, 0.5)'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                stacked: true,
+                            },
+                            y: {
+                                stacked: true
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: false,
+                                text: 'Full Combo Achievement Over Time'
+                            }
+                        }
+                    }
+                });
+            }
+
+            generateStackedBarCharts(data);
 
 
             // Initial call
