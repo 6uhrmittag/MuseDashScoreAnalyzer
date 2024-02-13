@@ -2,9 +2,12 @@
 
 Helper to view and analyze personal statistic of your Muse Dash scores.
 
-**Status:** This script exports the scores as CSV and JSON and creates a HTML site with charts using [charts.js](https://www.chartjs.org/)
+This Repo currently contains two versions:
 
-**Disclaimer:** This works only for windows and only for game runs on that specific computer, since it extracts the scores from local log-files. I don't know far back th log-files go, so it might not be able to extract all scores.
+1. online version: https://6uhrmittag.github.io/MuseDashScoreAnalyzer
+2. offline version that works with Powershell: `Export-MuseDashScores.ps1`
+
+**Disclaimer:** This works by extracting the scores from the game logfiles. Every time the game is played, a logfile is written. I don't know far back th log-files go, so it might not be able to extract all scores.
 
 ![GifOfVisualizations](_static/GifOfVisualizations.gif)
 
@@ -35,6 +38,11 @@ I want to have a view of my own Muse Dash scores over time to see how I improve.
     - [x] full combo vs. no full combo runs
 
 # How to use
+
+## Online Version
+
+1. Go to: https://6uhrmittag.github.io/MuseDashScoreAnalyzer
+2. Follow the instructions
 
 ## Export-MuseDashScores.ps1
 

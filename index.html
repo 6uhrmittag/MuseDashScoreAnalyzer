@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Muse Dash Log Files</title>
+    <style>
+        body {
+            font-family: source-han-sans-simplified-c, sans-serif;
+            font-style: normal;
+            font-weight: 700;
+            background-color: #f4f4f8;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: rgba(254, 48, 183, 0.8);
+            color: #fff;
+            padding: 20px 0;
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .upload-container {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            width: 80%; /* Adjusted for more width */
+            max-width: 800px; /* Ensures a maximum width */
+            text-align: center;
+            border: 2px dashed #fa92fc;
+            position: relative;
+            cursor: pointer;
+            overflow-wrap: break-word; /* Ensures text wraps inside the container */
+            cursor: pointer; /* Indicates the entire area is clickable */
+            position: relative; /* Ensures the positioning context is set for the children */
+        }
+
+        /* Style for the upload instructions to specifically handle filenames */
+        .file-names {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 10px; /* Spacing between filenames and the upload notice */
+        }
+
+        .upload-container:hover {
+            background-color: #f4f4f8;
+        }
+
+        .upload-container input[type="file"] {
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        .upload-instructions {
+            font-size: 16px;
+            color: #333;
+        }
+
+        button {
+            background-color: #fa92fc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #ff1a89;
+        }
+
+        .instructions-container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 900px;
+        }
+
+        .instructions-container h2, .instructions-container h3 {
+            color: #ff1a89;
+        }
+
+        .instructions-container p, .instructions-container ul {
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .instructions-container code {
+            background-color: #f4f4f8;
+            border-radius: 5px;
+            padding: 2px 4px;
+        }
+
+        .note {
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        .github-badge {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background-color: #ff1a89;
+            color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-decoration: none;
+            text-align: left;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+
+        .github-badge:hover {
+            background-color: #f9d71f;
+        }
+
+        .pop-over {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 50%;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000; /* Ensure it's above other content */
+            padding: 20px;
+            display: none; /* Hidden by default */
+        }
+
+
+        .image-container img {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds a shadow effect */
+            transition: box-shadow 0.3s ease; /* Smooth transition for hover effect */
+        }
+
+        .image-container img:hover {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Darker shadow on hover for emphasis */
+            opacity: 0.8;
+        }
+
+        .image-container p {
+            margin-bottom: 8px; /* Ensures spacing between the text and image */
+            color: #333; /* Adjust color as needed */
+            font-size: 14px; /* Adjust font size as needed */
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎵
+    <span style="color: #f9d71f;">MUSE</span><span style="color: #ff1a89;">DASH</span> Score Analyzer 🎵
+</h1>
+
+<div class="instructions-container">
+    <h2>How to Get Started</h2>
+    <p>Muse Dash Score Analyzer works by extracting your scores and stats from the MuseDash logs on your computer. MuseDash stores a logfile for every run of the game, so lots of data to see your progress over time!</p>
+
+    <p class="note">
+        <strong>Note:</strong> Your data stays inside the browser and doesn't get uploaded anywhere.
+    </p>
+
+    <!-- Image that opens the pop-over -->
+    <div class="image-container">
+        <p>Preview. Click to enlarge</p> <!-- Prompt text -->
+        <img src="_static/GifOfVisualizations.gif" alt="Visualization Preview" style="height: 200px; cursor: pointer;" id="previewImage">
+    </div>
+
+    <!-- Pop-over -->
+    <div class="pop-over" id="popOver" style="display:none;">
+        <img src="_static/GifOfVisualizations.gif" alt="Visualization Preview" style="max-width: 100%;">
+    </div>
+
+    <h3>Step 1: Gather Your Log Files 📁</h3>
+    <p>Find your scores in log files at
+        <code>C:\Users\&lt;YourWindowsUsername&gt;\AppData\LocalLow\PeroPeroGames\MuseDash\Logs\</code>
+    </p>
+
+    <h3>Step 2: Upload! 🚀</h3>
+    <p>Click on the "Click to upload or drag and drop your files here" area to select
+        <strong>all</strong> your log files, or just drag and drop them.</p>
+
+    <h3>Step 3: Data Processing ✨</h3>
+    <p>Hit the "Upload and Process" button and give it a few seconds to crunch those numbers.</p>
+
+    <h3>Step 4: View Your Stats! 📊</h3>
+    <p>After the processing is done, you get redirected to the Visualization Page automatically.</p>
+
+</div>
+
+<div class="upload-container">
+    <div class="upload-instructions">
+        Click to upload or drag and drop your files here
+    </div>
+    <input type="file" id="logFiles" multiple accept=".log" style="display:none;">
+</div>
+<button id="uploadButton">Upload and Process</button>
+
+<script src="uploadAndParse.js"></script>
+<script>
+    const uploadContainer = document.querySelector('.upload-container');
+    const uploadInstructions = document.querySelector('.upload-instructions');
+    const fileInput = document.getElementById('logFiles');
+
+    document.querySelector('.upload-container').addEventListener('click', function () {
+        document.getElementById('logFiles').click(); // Programmatically trigger the file input click
+    });
+
+    document.getElementById('logFiles').addEventListener('change', function (e) {
+        handleFiles(this.files); // Assuming you have a handleFiles function to process selected files
+    });
+
+    // Function to display filenames and maintain the upload notice
+    function updateUploadInstructions(files) {
+        let content = files.length ? "<div class='file-names'>" + Array.from(files).map(file => file.name).join(', ') + "</div>" : '';
+        content += 'Click to upload or drag and drop your files here';
+        uploadInstructions.innerHTML = content;
+    }
+
+    uploadContainer.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        uploadContainer.style.backgroundColor = '#f0f0f5';
+    });
+
+    uploadContainer.addEventListener('dragleave', function (e) {
+        uploadContainer.style.backgroundColor = '#fff';
+    });
+
+    uploadContainer.addEventListener('drop', function (e) {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        fileInput.files = files;
+        updateUploadInstructions(files);
+        uploadContainer.style.backgroundColor = '#fff';
+    });
+
+    fileInput.addEventListener('change', function () {
+        updateUploadInstructions(this.files);
+    });
+</script>
+
+<script>
+    <!-- Pop-over script -->
+    document.getElementById('previewImage').addEventListener('click', function (event) {
+        event.stopPropagation(); // Prevents the click from being immediately caught by the document listener
+        document.getElementById('popOver').style.display = 'block';
+    });
+
+    document.getElementById('popOver').addEventListener('click', function (event) {
+        event.stopPropagation(); // Prevents the click from propagating to the document
+    });
+
+    // Close the pop-over when clicking anywhere else on the page
+    document.addEventListener('click', function () {
+        const popOver = document.getElementById('popOver');
+        if (popOver.style.display === 'block') {
+            popOver.style.display = 'none';
+        }
+    });
+</script>
+
+<a href="https://github.com/6uhrmittag/MuseDashScoreAnalyzer" target="_blank" class="github-badge"> This project is open-source. Found a bug or have feedback? Please open an issue
+    <br/> github.com/6uhrmittag/MuseDashScoreAnalyzer
+    <br/>MuseDashScoreAnalyzer is not affiliated with muse dash or peroperogames </a>
+
+</body>
+</html>
