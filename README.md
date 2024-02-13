@@ -24,7 +24,8 @@ I want to have a view of my own Muse Dash scores over time to see how I improve.
     - [x] create a mapping chart from ID to chinese and english name
     - [ ] add a switch to turn off the translation for the online version
 - [ ] maybe one chart with all scores to see all scores over time
-- [ ] exclude failed runs(`result_finished:false`) from the chart
+- [ ] switch to exclude failed runs(`result_finished:false`) from the chart
+- [ ] switch to exclude runs with only one datapoint
 - [ ] add more charts for different statistics
     - [x] failed runs
     - [x] full combo
