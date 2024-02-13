@@ -6,6 +6,8 @@ Helper to view and analyze personal statistic of your Muse Dash scores.
 
 **Disclaimer:** This works only for windows and only for game runs on that specific computer, since it extracts the scores from local log-files. I don't know far back th log-files go, so it might not be able to extract all scores.
 
+![GifOfVisualizations](_static/GifOfVisualizations.gif)
+
 ## Overall Motivation
 
 I want to have a view of my own Muse Dash scores over time to see how I improve.
