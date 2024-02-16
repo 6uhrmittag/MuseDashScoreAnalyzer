@@ -782,7 +782,7 @@
                 });
 
                 window.myAccuracyChart = new Chart(ctx, {
-                    type: 'line',
+                    type: 'scatter',
                     data: {
                         datasets: datasets.filter(dataset => dataset.data.length > 0) // Filter out empty datasets
                     },
