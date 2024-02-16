@@ -102,6 +102,68 @@
             color: #f9d71f;
         }
 
+        /* CSS for the Filter Checkbox START */
+        .custom-checkbox-label {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            color: #fa92fc; /* Your chosen color */
+            font-weight: bold; /* Make text stand out */
+            user-select: none; /* Prevent text selection */
+            padding-left: 30px; /* Add space on the left for the custom checkbox */
+        }
+
+        .custom-checkbox-label input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .custom-checkbox {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: #fff;
+            border: 2px solid #fa92fc; /* Border color */
+            border-radius: 4px; /* Slightly rounded corners for a softer look */
+            transform: translateY(-50%); /* Adjust vertically to center with the text */
+            top: 50%; /* Center vertically relative to the label */
+        }
+
+        .custom-checkbox-label:hover input ~ .custom-checkbox {
+            background-color: #f4e1f7; /* Lighter shade for hover effect */
+        }
+
+        .custom-checkbox-label input:checked ~ .custom-checkbox {
+            background-color: #fa92fc; /* Background color when checked */
+        }
+
+        .custom-checkbox:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .custom-checkbox-label input:checked ~ .custom-checkbox:after {
+            display: block;
+        }
+
+        .custom-checkbox-label .custom-checkbox:after {
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+        /* CSS for the Filter Checkbox END */
 
     </style>
 </head>
@@ -121,6 +183,11 @@
 <div class="chart-container">
     <h2 class="song-title">Accuracy Over Time</h2>
     <canvas id="accuracyOverTimeChart"></canvas>
+    <label class="custom-checkbox-label">
+        <input type="checkbox" id="filterAccuracyCheckbox" />
+        <span class="custom-checkbox"></span>
+        Show Only Best Accuracy Per Day
+    </label>
 </div>
 
 <div id="chartsArea"></div>
@@ -666,11 +733,16 @@
             }
 
 
-            // Function to generate the Accuracy Over Time line chart with colored data points based on accuracy ranges
-            function generateAccuracyOverTimeChart(data) {
+            // Function to generate the Accuracy Over Time chart remains the same
+            function generateAccuracyOverTimeChart(data, filterBestPerDay = false) {
                 const ctx = document.getElementById('accuracyOverTimeChart').getContext('2d');
-                // Sort data by time
-                const sortedData = data.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+                let processedData = filterBestPerDay ? filterDataForHighestAccuracyPerDay(data) : data;
+                const sortedData = processedData.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+                if (window.myAccuracyChart) {
+                    window.myAccuracyChart.destroy();
+                }
 
                 // Initialize datasets array with explicit boundaries to avoid undefined behavior
                 const datasets = [
@@ -709,7 +781,7 @@
                     }
                 });
 
-                new Chart(ctx, {
+                window.myAccuracyChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         datasets: datasets.filter(dataset => dataset.data.length > 0) // Filter out empty datasets
@@ -743,9 +815,31 @@
                 });
             }
 
+            // State variable to track if the accuracy chart is currently filtered
+            let isAccuracyChartFiltered = false;
 
-            generateAccuracyOverTimeChart(data);
+            // Attach an event listener to the checkbox for when its state changes
+            document.getElementById('filterAccuracyCheckbox').addEventListener('change', function(event) {
+                // Use the checkbox's checked state to determine if the chart should be filtered
+                isAccuracyChartFiltered = event.target.checked;
+                generateAccuracyOverTimeChart(data, isAccuracyChartFiltered);
+            });
+            function filterDataForHighestAccuracyPerDay(data) {
+                const accuracyByDay = {};
 
+                data.forEach(item => {
+                    const day = item.time.split(' ')[0]; // Assuming 'time' is in a format that includes the date at the beginning
+                    if (!accuracyByDay[day] || accuracyByDay[day].result_acc < item.result_acc) {
+                        accuracyByDay[day] = item;
+                    }
+                });
+
+                return Object.values(accuracyByDay);
+            }
+
+
+            // Create Chart: Accuracy Over Time
+            generateAccuracyOverTimeChart(data, false);
 
             generateStackedBarCharts(data);
 
