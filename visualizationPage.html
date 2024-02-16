@@ -118,6 +118,11 @@
 
 </div>
 
+<div class="chart-container">
+    <h2 class="song-title">Accuracy Over Time</h2>
+    <canvas id="accuracyOverTimeChart"></canvas>
+</div>
+
 <div id="chartsArea"></div>
 
 <script>
@@ -668,6 +673,88 @@
                     }
                 });
             }
+
+
+            // Function to generate the Accuracy Over Time line chart with colored data points based on accuracy ranges
+            function generateAccuracyOverTimeChart(data) {
+                const ctx = document.getElementById('accuracyOverTimeChart').getContext('2d');
+                // Sort data by time
+                const sortedData = data.sort((a, b) => new Date(a.time) - new Date(b.time));
+
+                // Initialize datasets array with explicit boundaries to avoid undefined behavior
+                const datasets = [
+                    //@formatter:off
+                    { label: '<= 90%', data: [], borderColor: 'red', backgroundColor: 'rgba(255, 99, 132, 0.2)' },
+                    { label: '>= 90% - <95%', data: [], borderColor: 'orange', backgroundColor: 'rgba(255, 159, 64, 0.2)' },
+                    { label: '95%', data: [], borderColor: 'yellow', backgroundColor: 'rgba(255, 205, 86, 0.2)' },
+                    { label: '96%', data: [], borderColor: 'green', backgroundColor: 'rgba(75, 192, 192, 0.2)' },
+                    { label: '97%', data: [], borderColor: 'blue', backgroundColor: 'rgba(54, 162, 235, 0.2)' },
+                    { label: '98%', data: [], borderColor: 'indigo', backgroundColor: 'rgba(153, 102, 255, 0.2)' },
+                    { label: '99%', data: [], borderColor: 'violet', backgroundColor: 'rgba(201, 203, 207, 0.2)' },
+                    { label: '100%', data: [], borderColor: 'purple', backgroundColor: 'rgba(255, 99, 132, 0.2)' }
+                    //@formatter:on
+                ];
+
+                // Categorize each data point and add to the appropriate dataset
+                sortedData.forEach(item => {
+                    const accuracy = item.result_acc;
+                    const time = new Date(item.time);
+                    let categoryIndex = null; // Use null to represent an unassigned category
+
+                    if (accuracy <= 90) categoryIndex = 0;
+                    else if (accuracy < 95) categoryIndex = 1;
+                    else if (accuracy >= 95 && accuracy < 96) categoryIndex = 2;
+                    else if (accuracy >= 96 && accuracy < 97) categoryIndex = 3;
+                    else if (accuracy >= 97 && accuracy < 98) categoryIndex = 4;
+                    else if (accuracy >= 98 && accuracy < 99) categoryIndex = 5;
+                    else if (accuracy >= 99 && accuracy < 100) categoryIndex = 6;
+                    else if (accuracy === 100) categoryIndex = 7;
+
+                    if (categoryIndex !== null) { // Ensure categoryIndex is assigned
+                        datasets[categoryIndex].data.push({
+                            x: time,
+                            y: accuracy
+                        });
+                    }
+                });
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: datasets.filter(dataset => dataset.data.length > 0) // Filter out empty datasets
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day',
+                                    tooltipFormat: 'yyyy-MM-dd',
+                                    displayFormats: {
+                                        day: 'yyyy-MM-dd'
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                suggestedMax: 100, // Ensure the scale goes up to 100%
+                                title: {
+                                    display: true,
+                                    text: 'Accuracy (%)'
+                                }
+                            }
+                        },
+                    }
+                });
+            }
+
+
+            generateAccuracyOverTimeChart(data);
+
 
             generateStackedBarCharts(data);
 
