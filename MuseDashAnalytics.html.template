@@ -81,6 +81,28 @@
         canvas {
             margin-top: 10px;
         }
+
+        .github-footer {
+            width: 100%;
+            background-color: #ff1a89;
+            color: #fff;
+            text-align: center;
+            padding: 20px 10px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+        }
+
+        .github-footer a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .github-footer a:hover {
+            color: #f9d71f;
+        }
+
+
     </style>
 </head>
 <body>
@@ -648,6 +670,11 @@
     ;
 </script>
 
+<footer class="github-footer">
+    <a href="https://github.com/6uhrmittag/MuseDashScoreAnalyzer" target="_blank"> This project is open-source. Found a bug or have feedback? Please open an issue.
+        <br/> github.com/6uhrmittag/MuseDashScoreAnalyzer
+        <br/>MuseDashScoreAnalyzer is not affiliated with muse dash or peroperogames </a>
+</footer>
 </body>
 </html>
 
