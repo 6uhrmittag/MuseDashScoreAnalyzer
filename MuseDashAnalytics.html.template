@@ -925,7 +925,7 @@
 
             function generateHighestAccuracyPerLevelChart(data) {
                 // Process the data to find the highest accuracy per level
-                const filteredData = data.filter(item => item.result_acc !== null);
+                const filteredData = data.filter(item => item.result_acc != null);
                 const highestAccuracyPerLevel = {};
 
                 filteredData.forEach(item => {
@@ -1002,7 +1002,7 @@
                 const levelData = {};
 
                 // Filter out null accuracies and aggregate data by level
-                data.filter(item => item.result_acc !== null).forEach(item => {
+                data.filter(item => item.result_acc != null).forEach(item => {
                     const level = item.music_level;
                     if (!levelData[level]) {
                         levelData[level] = {totalAcc: 0, count: 0, colors: []};
