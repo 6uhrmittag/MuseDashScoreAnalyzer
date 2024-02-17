@@ -816,7 +816,7 @@
                                 }
                             },
                             y: {
-                                beginAtZero: true,
+                                beginAtZero: false,
                                 suggestedMax: 100, // Ensure the scale goes up to 100%
                                 title: {
                                     display: true,
