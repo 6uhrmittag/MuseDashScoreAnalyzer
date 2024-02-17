@@ -190,6 +190,19 @@
     </label>
 </div>
 
+<div class="chart-container">
+    <h2 class="song-title">Accuracy Over Time by Music Level</h2>
+    <canvas id="accuracyByLevelChart"></canvas>
+</div>
+<div class="chart-container">
+    <h2 class="song-title">Highest Accuracy per Music Level</h2>
+    <canvas id="radarChart"></canvas>
+</div>
+<div class="chart-container">
+    <h2 class="song-title">Average Accuracy per Music Level</h2>
+    <canvas id="bubbleChart"></canvas>
+</div>
+
 <div id="chartsArea"></div>
 
 <script>
@@ -845,6 +858,245 @@
 
                 return Object.values(accuracyByDay);
             }
+
+
+            function aggregateDataByLevelAndDay(data) {
+                const accuracyByDayAndLevel = {};
+                const colorGenerator = createColorGenerator(); // Assuming this is already defined
+
+                const filteredData = data.filter(item => item.result_acc !== null);
+
+
+                filteredData.forEach(item => {
+                    const day = new Date(item.time.split(' ')[0]); // Assume ISO 8601 format
+                    const levelKey = `Level ${item.music_level}`;
+                    const dayKey = day.toISOString().split('T')[0]; // Normalize date to YYYY-MM-DD
+
+                    if (!accuracyByDayAndLevel[levelKey]) accuracyByDayAndLevel[levelKey] = {};
+                    if (!accuracyByDayAndLevel[levelKey][dayKey] || accuracyByDayAndLevel[levelKey][dayKey].y < item.result_acc) {
+                        accuracyByDayAndLevel[levelKey][dayKey] = {x: day, y: item.result_acc};
+                    }
+                });
+
+                // Sort and prepare datasets
+                const sortedLevelKeys = Object.keys(accuracyByDayAndLevel).sort((a, b) => {
+                    return parseInt(a.replace('Level ', ''), 10) - parseInt(b.replace('Level ', ''), 10);
+                });
+
+                const datasets = sortedLevelKeys.map(levelKey => {
+                    let dataPoints = Object.values(accuracyByDayAndLevel[levelKey]);
+                    // Sort data points by date within each level
+                    dataPoints = dataPoints.sort((a, b) => new Date(a.x) - new Date(b.x));
+
+                    return {
+                        label: levelKey,
+                        data: dataPoints,
+                        fill: false,
+                        borderColor: colorGenerator(),
+                    };
+                });
+
+                return datasets;
+            }
+
+            const datasets = aggregateDataByLevelAndDay(data);
+
+            function generateAccuracyByLevelChart(datasets) {
+                const ctx = document.getElementById('accuracyByLevelChart').getContext('2d');
+
+                if (window.myLineChart) window.myLineChart.destroy(); // Destroy previous instance if exists
+
+                window.myLineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {datasets},
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day',
+                                    tooltipFormat: 'yyyy-MM-dd',
+                                    displayFormats: {
+                                        day: 'yyyy-MM-dd'
+                                    }
+                                },
+                            },
+                            y: {
+                                beginAtZero: false,
+                            }
+                        },
+                    }
+                });
+            }
+
+            generateAccuracyByLevelChart(aggregateDataByLevelAndDay(data));
+
+
+            function generateHighestAccuracyPerLevelChart(data) {
+                // Process the data to find the highest accuracy per level
+                const filteredData = data.filter(item => item.result_acc !== null);
+                const highestAccuracyPerLevel = {};
+
+                filteredData.forEach(item => {
+                    const level = `Level ${item.music_level}`;
+                    if (!highestAccuracyPerLevel[level] || highestAccuracyPerLevel[level] < item.result_acc) {
+                        highestAccuracyPerLevel[level] = item.result_acc;
+                    }
+                });
+
+                const radarLabels = Object.keys(highestAccuracyPerLevel).sort((a, b) => a.localeCompare(b, undefined, {
+                    numeric: true,
+                    sensitivity: 'base'
+                }));
+                const radarData = radarLabels.map(label => highestAccuracyPerLevel[label]);
+
+                // Generate the radar chart
+                const ctx = document.getElementById('radarChart').getContext('2d');
+
+                // Check if the chart instance already exists
+                if (window.radarChartInstance) {
+                    window.radarChartInstance.destroy(); // Destroy the existing chart before creating a new one
+                }
+
+                window.radarChartInstance = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: radarLabels.map(label => `Level ${label.split(' ')[1]}`), // Format labels
+                        datasets: [{
+                            label: 'Highest Accuracy per Music Level',
+                            data: radarData,
+                            fill: true,
+                            backgroundColor: 'rgba(250, 146, 252, 0.2)', // Muse Dash-inspired pink
+                            borderColor: '#FA92FC',
+                            pointBackgroundColor: '#FA92FC',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#FA92FC'
+                        }]
+                    },
+                    options: {
+
+                        aspectRatio: 1.4,
+                        elements: {
+                            line: {
+                                borderWidth: 3
+                            }
+                        },
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    display: false
+                                },
+                                suggestedMin: 90,
+                                suggestedMax: 100, // Assuming accuracy can go up to 100%
+                                beginAtZero: false
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: false,
+                                text: 'Highest Accuracy per Music Level'
+                            }
+                        }
+                    }
+                });
+            }
+
+
+            function prepareBubbleChartData(data) {
+                const colorGenerator = createColorGenerator(); // Initialize the color generator
+                const levelData = {};
+
+                // Filter out null accuracies and aggregate data by level
+                data.filter(item => item.result_acc !== null).forEach(item => {
+                    const level = item.music_level;
+                    if (!levelData[level]) {
+                        levelData[level] = {totalAcc: 0, count: 0, colors: []};
+                    }
+                    levelData[level].totalAcc += item.result_acc;
+                    levelData[level].count += 1;
+                    levelData[level].colors.push(colorGenerator()); // Push a new color for each entry
+                });
+
+                // Convert aggregated data into chart.js format
+                const bubbleChartData = {
+                    datasets: [{
+                        label: 'Average Accuracy',
+                        data: [],
+                        backgroundColor: [], // Define as an array to hold multiple colors
+                    }]
+                };
+
+                Object.keys(levelData).forEach(level => {
+                    const avgAcc = levelData[level].totalAcc / levelData[level].count;
+                    bubbleChartData.datasets[0].data.push({
+                        x: parseInt(level),
+                        y: avgAcc,
+                        r: Math.sqrt(levelData[level].count) * 5 // Adjust bubble size as needed
+                    });
+                    // Correspondingly, add colors for each data point
+                    bubbleChartData.datasets[0].backgroundColor.push(...levelData[level].colors.slice(0, 1)); // Assuming one color per level
+                });
+
+                return bubbleChartData;
+            }
+
+
+            function generateBubbleChart(data) {
+                const bubbleChartData = prepareBubbleChartData(data);
+
+                const ctx = document.getElementById('bubbleChart').getContext('2d');
+
+                if (window.bubbleChartInstance) {
+                    window.bubbleChartInstance.destroy(); // Properly handle existing chart instance
+                }
+
+                window.bubbleChartInstance = new Chart(ctx, {
+                    type: 'bubble',
+                    data: bubbleChartData,
+                    options: {
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Music Level'
+                                },
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Average Accuracy (%)'
+                                },
+                                beginAtZero: false,
+                                suggestedMax: 100
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        const data = context.raw;
+                                        const attempts = Math.round(Math.pow(data.r / 5, 2)); // Calculate attempts from bubble size
+                                        return `Level: ${data.x}, Avg Accuracy: ${data.y.toFixed(2)}%, Attempts: ${attempts}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+
+            generateBubbleChart(data);
+
+
+            generateHighestAccuracyPerLevelChart(data);
 
 
             // Create Chart: Accuracy Over Time
