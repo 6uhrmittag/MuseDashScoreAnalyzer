@@ -9,6 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 
     <style>
         body {
@@ -165,6 +167,33 @@
         }
         /* CSS for the Filter Checkbox END */
 
+        /* CSS for the Reset Button START */
+        .custom-button {
+            background-color: #fff; /* White background */
+            color: #fa92fc; /* Text color */
+            border: 2px solid #fa92fc; /* Border color */
+            border-radius: 4px; /* Rounded corners */
+            cursor: pointer;
+            font-weight: bold;
+            padding: 10px 20px; /* Padding inside the button */
+            margin-top: 10px; /* Space above the button */
+            text-align: center;
+            display: inline-block;
+            user-select: none; /* Prevent text selection */
+            transition: background-color 0.3s; /* Smooth transition for background color */
+        }
+
+        .custom-button:hover {
+            background-color: #f4e1f7; /* Lighter shade for hover effect */
+        }
+
+        .custom-button:active {
+            background-color: #fa92fc; /* Darker shade when the button is clicked */
+            color: white; /* Text color change for contrast */
+        }
+        /* CSS for the Reset Button END */
+
+
     </style>
 </head>
 <body>
@@ -188,11 +217,13 @@
         <span class="custom-checkbox"></span>
         Show Only Best Accuracy Per Day
     </label>
+    <button class="custom-button reset-zoom-button">Reset Zoom</button>
 </div>
 
 <div class="chart-container">
     <h2 class="song-title">Accuracy Over Time by Music Level</h2>
     <canvas id="accuracyByLevelChart"></canvas>
+    <button class="custom-button reset-zoom-button">Reset Zoom</button>
 </div>
 <div class="chart-container">
     <h2 class="song-title">Highest Accuracy per Music Level</h2>
@@ -214,6 +245,7 @@
             var data = <INSERT JSON HERE>;
 
             var includeUnfinished = false;
+            let allCharts = [];
 
             <!-- Doughnut Charts on top -->
             // Process data for "Used Characters"
@@ -237,7 +269,7 @@
             // Function to create a doughnut chart
             function createDoughnutChart(canvasId, title, data) {
                 const ctx = document.getElementById(canvasId).getContext('2d');
-                new Chart(ctx, {
+                var RunsPerSongDoughnutChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: Object.keys(data),
@@ -274,6 +306,7 @@
                         }
                     }
                 });
+                allCharts.push(RunsPerSongDoughnutChart);
             }
 
 
@@ -406,6 +439,24 @@
                     statsElement.textContent = statsText;
                     songContainer.appendChild(statsElement); // Append statistics below the song title
 
+
+                    // Create and append the Reset Zoom button
+                    var resetZoomButton = document.createElement('button');
+                    resetZoomButton.textContent = 'Reset Zoom';
+                    resetZoomButton.className = 'custom-button reset-zoom-button'; // Set the class name here
+                    resetZoomButton.addEventListener('click', function() {
+                        allCharts.forEach(function(chart) {
+                            if (chart.resetZoom) {
+                                chart.resetZoom();
+                            }
+                        });
+                    });
+
+
+                    songContainer.appendChild(resetZoomButton); // Append the reset button below the stats
+
+
+
                     document.getElementById('chartsArea').appendChild(songContainer);
 
                     var songChartsData = prepareChartData(songData);
@@ -473,7 +524,7 @@
                 var scoreCtx = document.getElementById(`scoreChart-${songName.replace(/\s+/g, '-')}`).getContext('2d');
                 var accuracyCtx = document.getElementById(`accuracyChart-${songName.replace(/\s+/g, '-')}`).getContext('2d');
 
-                new Chart(scoreCtx, {
+                var scoreBySongChart = new Chart(scoreCtx, {
                     type: 'line',
                     data: {
                         labels: chartData.labels,
@@ -486,6 +537,29 @@
                             title: {
                                 display: true,
                                 text: 'Score over Time'
+                            },
+                            zoom: {
+                                zoom: {
+                                    wheel: {
+                                        enabled: true,
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+
+                                    drag: {
+                                        enabled: false,
+                                    },
+                                    mode: 'xy',
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'xy',
+                                },
+                                limits: {
+                                    x: {min: 'original', max: 'original'},
+                                    y: {min: 'original', max: 'original'}
+                                },
                             },
                             //tooltip: {
                             //    callbacks: {
@@ -528,8 +602,9 @@
                         }
                     }
                 });
+                allCharts.push(scoreBySongChart);
 
-                new Chart(accuracyCtx, {
+                var accuracyBySongChart = new Chart(accuracyCtx, {
                     type: 'line',
                     data: {
                         labels: chartData.labels,
@@ -543,6 +618,29 @@
                                 display: true,
                                 text: 'Accuracy over Time'
                             },
+                            zoom: {
+                                zoom: {
+                                    wheel: {
+                                        enabled: true,
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+
+                                    drag: {
+                                        enabled: false,
+                                    },
+                                    mode: 'xy',
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'xy',
+                                },
+                                limits: {
+                                    x: {min: 'original', max: 'original'},
+                                    y: {min: 'original', max: 'original'}
+                                },
+                            }
                             //tooltip: {
                             //    callbacks: {
                             //        afterBody: function (context) {
@@ -584,6 +682,8 @@
                         }
                     }
                 });
+                allCharts.push(accuracyBySongChart);
+
             }
 
             // Create a uniq colour palette per chart to prevent duplicate colours per chart
@@ -678,7 +778,7 @@
 
                 // Chart for Finished vs. Failed
                 var ctx = document.getElementById('finishedFailedChart').getContext('2d');
-                new Chart(ctx, {
+                var finishedFailedChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
@@ -709,10 +809,11 @@
                         }
                     }
                 });
+                allCharts.push(finishedFailedChart);
 
                 // Chart for Full Combo vs. No Full Combo
                 ctx = document.getElementById('fullComboChart').getContext('2d');
-                new Chart(ctx, {
+                var fullComboChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
                         labels: labels,
@@ -743,6 +844,7 @@
                         }
                     }
                 });
+                allCharts.push(fullComboChart);
             }
 
 
@@ -800,6 +902,31 @@
                         datasets: datasets.filter(dataset => dataset.data.length > 0) // Filter out empty datasets
                     },
                     options: {
+                        plugins: {
+                            zoom: {
+                                zoom: {
+                                    wheel: {
+                                        enabled: true,
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+
+                                    drag: {
+                                        enabled: false,
+                                    },
+                                    mode: 'xy',
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'xy',
+                                },
+                                limits: {
+                                    x: {min: 'original', max: 'original'},
+                                    y: {min: 'original', max: 'original'}
+                                },
+                            }
+                        },
                         scales: {
                             x: {
                                 type: 'time',
@@ -826,6 +953,8 @@
                         },
                     }
                 });
+                allCharts.push(window.myAccuracyChart);
+
             }
 
             // State variable to track if the accuracy chart is currently filtered
@@ -901,6 +1030,31 @@
                     type: 'line',
                     data: {datasets},
                     options: {
+                        plugins: {
+                            zoom: {
+                                zoom: {
+                                    wheel: {
+                                        enabled: true,
+                                    },
+                                    pinch: {
+                                        enabled: true
+                                    },
+
+                                    drag: {
+                                        enabled: false,
+                                    },
+                                    mode: 'xy',
+                                },
+                                pan: {
+                                    enabled: true,
+                                    mode: 'xy',
+                                },
+                                limits: {
+                                    x: {min: 'original', max: 'original'},
+                                    y: {min: 'original', max: 'original'}
+                                },
+                            }
+                        },
                         scales: {
                             x: {
                                 type: 'time',
@@ -918,6 +1072,8 @@
                         },
                     }
                 });
+                allCharts.push(window.myLineChart);
+
             }
 
             generateAccuracyByLevelChart(aggregateDataByLevelAndDay(data));
@@ -1082,6 +1238,17 @@
                     }
                 });
             }
+
+            // Add event listener to all reset zoom buttons
+            document.querySelectorAll('.reset-zoom-button').forEach(button => {
+                button.addEventListener('click', function () {
+                    allCharts.forEach(function (chart) {
+                        if (chart.resetZoom) {
+                            chart.resetZoom();
+                        }
+                    });
+                });
+            });
 
 
             generateBubbleChart(data);

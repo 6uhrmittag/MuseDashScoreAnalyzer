@@ -26,6 +26,7 @@ I want to have a view of my own Muse Dash scores over time to see how I improve.
 - [ ] maybe one chart with all scores to see all scores over time
 - [ ] switch to exclude failed runs(`result_finished:false`) from the chart
 - [ ] switch to exclude runs with only one datapoint
+- [x] add zoom feature to the charts
 - [ ] add more charts for different statistics
     - [x] failed runs
     - [x] full combo
